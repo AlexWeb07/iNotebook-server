@@ -110,7 +110,7 @@ router.post(
 );
 
 router.post(
-  "/loginparam",
+  "/loginparam/:email/:password",
   async (req, res) => {
     let login=false
     const { email, password } = req.params;
