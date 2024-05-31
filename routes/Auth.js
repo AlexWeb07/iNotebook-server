@@ -109,6 +109,38 @@ router.post(
   }
 );
 
+router.post(
+  "/loginparam",
+  async (req, res) => {
+    let login=false
+    const { email, password } = req.params;
+    try {
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        return res
+          .status(400)
+          .json({ login, msg: "Please try to login with correct credentials!!" });
+      }
+      const passwordCompare = await bcrypt.compare(password, user.password);
+      if (!passwordCompare) {
+        return res
+          .status(400)
+          .json({login, msg: "Enter correct password" });
+      }
+      const data = {
+        user: {
+          id: user.id,
+        },
+      };
+      const authToken = jwt.sign(data, JWT_SECRET);
+      login=true;
+      res.json({ login,authToken,msg:"You have succesfully logged in!!",userName:user.name });
+    } catch (error) {
+      res.status(500).send({login,msg:"Server Error, Try Again!!"});
+    }
+  }
+);
 // ROUTE 3: Get loggedin user details using:POST on '/api/auth/getUser' ; Require authentication
 
 router.post("/getUser", fetchUSer, async (req, res) => {
